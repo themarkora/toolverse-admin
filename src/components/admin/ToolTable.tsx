@@ -3,6 +3,7 @@ import { Tool } from "@/types/tools";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { Link } from "react-router-dom";
 import {
   Table,
   TableBody,
@@ -64,6 +65,13 @@ export function ToolTable({ tools, onToolUpdated }: ToolTableProps) {
               <TableCell>{tool.description}</TableCell>
               <TableCell>{tool.slug}</TableCell>
               <TableCell className="text-right space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  asChild
+                >
+                  <Link to={`/admin/tools/${tool.slug}/edit`}>View Tool Page</Link>
+                </Button>
                 <EditToolDialog tool={tool} onToolUpdated={onToolUpdated} />
                 <Button
                   variant="destructive"
