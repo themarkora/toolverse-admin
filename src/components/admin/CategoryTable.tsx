@@ -15,7 +15,6 @@ interface CategoryTableProps {
 
 export const CategoryTable = ({ categories }: CategoryTableProps) => {
   const isMainCategory = (category: Category) => !category.parent_id;
-  const isSubCategory = (category: Category) => !!category.parent_id;
 
   const getParentCategory = (parentId: string | null) => {
     if (!parentId) return null;
@@ -33,8 +32,9 @@ export const CategoryTable = ({ categories }: CategoryTableProps) => {
   const formatSubCategoryPath = (category: Category) => {
     const parent = getParentCategory(category.parent_id);
     if (!parent) return category.slug;
-    const parentName = parent.slug.replace(/\-?tools$/i, '');
-    return `${parentName}/${category.slug}`;
+    const parentName = formatMainCategoryName(parent.name).toLowerCase();
+    const subCategory = category.slug.replace(/^.*?\//, '');
+    return `${parentName}/${subCategory}`;
   };
 
   return (
@@ -43,8 +43,7 @@ export const CategoryTable = ({ categories }: CategoryTableProps) => {
         <TableRow>
           <TableHead className="w-[250px]">Main Category</TableHead>
           <TableHead className="w-[300px]">Description</TableHead>
-          <TableHead className="w-[250px]">Sub-category</TableHead>
-          <TableHead className="w-[250px]">Tool Slug Name</TableHead>
+          <TableHead>Sub-category</TableHead>
           <TableHead className="text-right">Actions</TableHead>
         </TableRow>
       </TableHeader>
@@ -57,11 +56,6 @@ export const CategoryTable = ({ categories }: CategoryTableProps) => {
               </TableCell>
               <TableCell>{mainCategory.description}</TableCell>
               <TableCell>-</TableCell>
-              <TableCell>
-                <code className="px-2 py-1 rounded bg-muted">
-                  {mainCategory.slug.replace(/\-?tools$/i, '')}/
-                </code>
-              </TableCell>
               <TableCell className="text-right">
                 <Button variant="outline" size="sm" className="mr-2">
                   Edit
@@ -82,18 +76,13 @@ export const CategoryTable = ({ categories }: CategoryTableProps) => {
                     {formatSubCategoryPath(subCategory)}
                   </code>
                 </TableCell>
-                <TableCell>
-                  <code className="px-2 py-1 rounded bg-muted">
-                    [tool-slug]
-                  </code>
-                </TableCell>
                 <TableCell className="text-right">
                   <Button variant="outline" size="sm" className="mr-2">
                     Edit
                   </Button>
                   <Button variant="destructive" size="sm">
                     Delete
-                </Button>
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}
