@@ -12,7 +12,6 @@ import { supabase } from "@/integrations/supabase/client";
 interface AddToolFormValues {
   name: string;
   description: string;
-  url: string;
 }
 
 export const AddToolDialog = ({ onToolAdded }: { onToolAdded: () => void }) => {
@@ -28,7 +27,6 @@ export const AddToolDialog = ({ onToolAdded }: { onToolAdded: () => void }) => {
       const { error } = await supabase.from('tools').insert({
         name: data.name,
         description: data.description,
-        url: data.url,
         slug: slug,
       });
 
@@ -85,19 +83,6 @@ export const AddToolDialog = ({ onToolAdded }: { onToolAdded: () => void }) => {
                   <FormLabel>Description</FormLabel>
                   <FormControl>
                     <Textarea placeholder="Tool description" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="url"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>URL</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Tool URL" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
