@@ -9,50 +9,8 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      categories: {
-        Row: {
-          created_at: string
-          description: string | null
-          id: string
-          is_active: boolean
-          name: string
-          parent_id: string | null
-          slug: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          is_active?: boolean
-          name: string
-          parent_id?: string | null
-          slug: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          is_active?: boolean
-          name?: string
-          parent_id?: string | null
-          slug?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "categories_parent_id_fkey"
-            columns: ["parent_id"]
-            isOneToOne: false
-            referencedRelation: "categories"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       tools: {
         Row: {
-          category_id: string | null
           created_at: string
           description: string | null
           id: string
@@ -62,7 +20,6 @@ export type Database = {
           url: string | null
         }
         Insert: {
-          category_id?: string | null
           created_at?: string
           description?: string | null
           id?: string
@@ -72,7 +29,6 @@ export type Database = {
           url?: string | null
         }
         Update: {
-          category_id?: string | null
           created_at?: string
           description?: string | null
           id?: string
@@ -81,15 +37,7 @@ export type Database = {
           updated_at?: string
           url?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "tools_category_id_fkey"
-            columns: ["category_id"]
-            isOneToOne: false
-            referencedRelation: "categories"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       user_roles: {
         Row: {

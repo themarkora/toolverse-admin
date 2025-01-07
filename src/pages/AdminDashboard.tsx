@@ -6,9 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/Navbar";
 import { Plus } from "lucide-react";
 import { StatsCards } from "@/components/admin/StatsCards";
-import { CategoryTable } from "@/components/admin/CategoryTable";
 import { ToolTable } from "@/components/admin/ToolTable";
-import { Category } from "@/types/categories";
 import { Tool } from "@/types/tools";
 import { Card } from "@/components/ui/card";
 
@@ -17,13 +15,11 @@ const AdminDashboard = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [userCount, setUserCount] = useState(0);
-  const [categories, setCategories] = useState<Category[]>([]);
   const [tools, setTools] = useState<Tool[]>([]);
 
   useEffect(() => {
     checkAdminAccess();
     fetchUserCount();
-    fetchCategories();
     fetchTools();
   }, []);
 
@@ -67,24 +63,6 @@ const AdminDashboard = () => {
     } catch (error) {
       console.error('Error fetching user count:', error);
     }
-  };
-
-  const fetchCategories = async () => {
-    const { data, error } = await supabase
-      .from('categories')
-      .select('*')
-      .order('name');
-
-    if (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to fetch categories",
-      });
-      return;
-    }
-
-    setCategories(data);
   };
 
   const fetchTools = async () => {
@@ -131,22 +109,8 @@ const AdminDashboard = () => {
 
         <StatsCards 
           userCount={userCount}
-          categoriesCount={categories.length}
           toolsCount={tools.length}
         />
-
-        {/* Categories Section */}
-        <div className="mb-8">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-semibold">Categories</h2>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" /> Add Category
-            </Button>
-          </div>
-          <Card>
-            <CategoryTable categories={categories} />
-          </Card>
-        </div>
 
         {/* Tools Section */}
         <div>

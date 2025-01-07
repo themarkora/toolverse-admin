@@ -21,17 +21,19 @@ export const ToolTable = ({ tools }: ToolTableProps) => {
           <TableHead>Name</TableHead>
           <TableHead>Description</TableHead>
           <TableHead>URL</TableHead>
-          <TableHead>Slug</TableHead>
           <TableHead className="text-right">Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {tools.map((tool) => (
           <TableRow key={tool.id}>
-            <TableCell>{tool.name}</TableCell>
+            <TableCell className="font-medium">{tool.name}</TableCell>
             <TableCell>{tool.description}</TableCell>
-            <TableCell>{tool.url}</TableCell>
-            <TableCell>{tool.slug}</TableCell>
+            <TableCell>
+              <code className="px-2 py-1 rounded bg-muted">
+                /tools/{tool.slug}
+              </code>
+            </TableCell>
             <TableCell className="text-right">
               <Button variant="outline" size="sm" className="mr-2">
                 Edit
