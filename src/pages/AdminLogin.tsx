@@ -16,17 +16,26 @@ const AdminLogin = () => {
   }, []);
 
   const checkAdmin = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session) {
-      const { data: roles } = await supabase
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+
+      const { data: userRole, error: roleError } = await supabase
         .from('user_roles')
         .select('role')
         .eq('user_id', session.user.id)
-        .single();
+        .maybeSingle();
 
-      if (roles?.role === 'admin') {
+      if (roleError) {
+        console.error('Error checking role:', roleError);
+        return;
+      }
+
+      if (userRole?.role === 'admin') {
         navigate('/admin');
       }
+    } catch (error) {
+      console.error('Session check error:', error);
     }
   };
 
@@ -35,33 +44,37 @@ const AdminLogin = () => {
     setLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email: "dj.mareli@gmail.com",
         password: "Webtoolverse11!",
       });
 
-      if (error) throw error;
+      if (authError) throw authError;
 
-      if (data.user) {
-        const { data: roles, error: rolesError } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', data.user.id)
-          .single();
-
-        if (rolesError) throw rolesError;
-
-        if (roles?.role === 'admin') {
-          navigate('/admin');
-        } else {
-          throw new Error('Unauthorized access');
-        }
+      if (!authData.user) {
+        throw new Error('No user data returned');
       }
+
+      const { data: userRole, error: roleError } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', authData.user.id)
+        .maybeSingle();
+
+      if (roleError) {
+        throw roleError;
+      }
+
+      if (userRole?.role !== 'admin') {
+        throw new Error('Unauthorized access - Admin privileges required');
+      }
+
+      navigate('/admin');
     } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: error.message,
+        description: error.message || 'An error occurred during login',
       });
     } finally {
       setLoading(false);
