@@ -20,6 +20,7 @@ type FormValues = z.infer<typeof formSchema>;
 
 export const AddToolDialog = ({ onToolAdded }: { onToolAdded: () => void }) => {
   const [open, setOpen] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -32,7 +33,6 @@ export const AddToolDialog = ({ onToolAdded }: { onToolAdded: () => void }) => {
   const generateUniqueSlug = async (baseName: string): Promise<string> => {
     const baseSlug = baseName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
     
-    // Check if the base slug exists
     const { data: existingTool } = await supabase
       .from('tools')
       .select('slug')
@@ -43,7 +43,6 @@ export const AddToolDialog = ({ onToolAdded }: { onToolAdded: () => void }) => {
       return baseSlug;
     }
 
-    // If slug exists, append a number until we find a unique one
     let counter = 1;
     let newSlug = `${baseSlug}-${counter}`;
     
@@ -63,21 +62,40 @@ export const AddToolDialog = ({ onToolAdded }: { onToolAdded: () => void }) => {
     }
   };
 
+  const generateToolComponent = async (slug: string) => {
+    try {
+      const response = await supabase.functions.invoke('generate-tool-component', {
+        body: { slug },
+      });
+
+      if (response.error) throw new Error(response.error.message);
+
+      return response.data;
+    } catch (error: any) {
+      throw new Error(`Failed to generate tool component: ${error.message}`);
+    }
+  };
+
   const onSubmit = async (data: FormValues) => {
     try {
+      setIsGenerating(true);
       const slug = await generateUniqueSlug(data.name);
 
-      const { error } = await supabase.from('tools').insert({
+      // First create the tool record
+      const { error: insertError } = await supabase.from('tools').insert({
         name: data.name,
         description: data.description || null,
         slug: slug,
       });
 
-      if (error) throw error;
+      if (insertError) throw insertError;
+
+      // Then generate the tool component
+      await generateToolComponent(slug);
 
       toast({
         title: "Success",
-        description: "Tool added successfully",
+        description: "Tool generated successfully",
       });
       
       form.reset();
@@ -89,6 +107,8 @@ export const AddToolDialog = ({ onToolAdded }: { onToolAdded: () => void }) => {
         title: "Error",
         description: error.message,
       });
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -96,12 +116,12 @@ export const AddToolDialog = ({ onToolAdded }: { onToolAdded: () => void }) => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button>
-          <Plus className="mr-2 h-4 w-4" /> Add Tool
+          <Plus className="mr-2 h-4 w-4" /> Generate Tool
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Add New Tool</DialogTitle>
+          <DialogTitle>Generate New Tool</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -131,7 +151,9 @@ export const AddToolDialog = ({ onToolAdded }: { onToolAdded: () => void }) => {
                 </FormItem>
               )}
             />
-            <Button type="submit">Add Tool</Button>
+            <Button type="submit" disabled={isGenerating}>
+              {isGenerating ? "Generating..." : "Generate Tool"}
+            </Button>
           </form>
         </Form>
       </DialogContent>
