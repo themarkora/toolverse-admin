@@ -20,16 +20,11 @@ const AdminLogin = () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
 
-      const { data: userRole, error: roleError } = await supabase
+      const { data: userRole } = await supabase
         .from('user_roles')
         .select('role')
         .eq('user_id', session.user.id)
         .maybeSingle();
-
-      if (roleError) {
-        console.error('Error checking role:', roleError);
-        return;
-      }
 
       if (userRole?.role === 'admin') {
         navigate('/admin');
