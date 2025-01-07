@@ -5,17 +5,50 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/Navbar";
-import { Users, Database, Settings } from "lucide-react";
+import {
+  Users,
+  Database,
+  Settings,
+  FolderPlus,
+  Tool,
+  Plus,
+} from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
+interface Category {
+  id: string;
+  name: string;
+  description: string | null;
+}
+
+interface Tool {
+  id: string;
+  name: string;
+  description: string | null;
+  url: string | null;
+  category_id: string | null;
+}
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [userCount, setUserCount] = useState(0);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [tools, setTools] = useState<Tool[]>([]);
 
   useEffect(() => {
     checkAdminAccess();
     fetchUserCount();
+    fetchCategories();
+    fetchTools();
   }, []);
 
   const checkAdminAccess = async () => {
@@ -60,6 +93,42 @@ const AdminDashboard = () => {
     }
   };
 
+  const fetchCategories = async () => {
+    const { data, error } = await supabase
+      .from('categories')
+      .select('*')
+      .order('name');
+
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to fetch categories",
+      });
+      return;
+    }
+
+    setCategories(data);
+  };
+
+  const fetchTools = async () => {
+    const { data, error } = await supabase
+      .from('tools')
+      .select('*')
+      .order('name');
+
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to fetch tools",
+      });
+      return;
+    }
+
+    setTools(data);
+  };
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate('/admin/login');
@@ -84,7 +153,7 @@ const AdminDashboard = () => {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Users</CardTitle>
@@ -95,28 +164,100 @@ const AdminDashboard = () => {
             </CardContent>
           </Card>
 
-          <Card className="cursor-pointer hover:bg-accent/50 transition-colors">
+          <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Database Management</CardTitle>
-              <Database className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium">Categories</CardTitle>
+              <FolderPlus className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Manage database records and configurations
-              </p>
+              <div className="text-2xl font-bold">{categories.length}</div>
             </CardContent>
           </Card>
 
-          <Card className="cursor-pointer hover:bg-accent/50 transition-colors">
+          <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Settings</CardTitle>
-              <Settings className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium">Tools</CardTitle>
+              <Tool className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Configure system settings and preferences
-              </p>
+              <div className="text-2xl font-bold">{tools.length}</div>
             </CardContent>
+          </Card>
+        </div>
+
+        {/* Categories Section */}
+        <div className="mb-8">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-semibold">Categories</h2>
+            <Button>
+              <Plus className="mr-2 h-4 w-4" /> Add Category
+            </Button>
+          </div>
+          <Card>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Description</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {categories.map((category) => (
+                  <TableRow key={category.id}>
+                    <TableCell>{category.name}</TableCell>
+                    <TableCell>{category.description}</TableCell>
+                    <TableCell className="text-right">
+                      <Button variant="outline" size="sm" className="mr-2">
+                        Edit
+                      </Button>
+                      <Button variant="destructive" size="sm">
+                        Delete
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Card>
+        </div>
+
+        {/* Tools Section */}
+        <div>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-semibold">Tools</h2>
+            <Button>
+              <Plus className="mr-2 h-4 w-4" /> Add Tool
+            </Button>
+          </div>
+          <Card>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Description</TableHead>
+                  <TableHead>URL</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {tools.map((tool) => (
+                  <TableRow key={tool.id}>
+                    <TableCell>{tool.name}</TableCell>
+                    <TableCell>{tool.description}</TableCell>
+                    <TableCell>{tool.url}</TableCell>
+                    <TableCell className="text-right">
+                      <Button variant="outline" size="sm" className="mr-2">
+                        Edit
+                      </Button>
+                      <Button variant="destructive" size="sm">
+                        Delete
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </Card>
         </div>
       </div>
