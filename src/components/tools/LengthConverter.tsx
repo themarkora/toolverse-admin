@@ -4,7 +4,15 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 
-const conversionRates = {
+type UnitType = "meters" | "kilometers" | "miles" | "feet" | "inches";
+
+type ConversionRates = {
+  [key in UnitType]: {
+    [key in UnitType]: number;
+  };
+};
+
+const conversionRates: ConversionRates = {
   meters: {
     meters: 1,
     kilometers: 0.001,
@@ -44,8 +52,8 @@ const conversionRates = {
 
 export default function LengthConverter() {
   const [value, setValue] = useState<string>("");
-  const [fromUnit, setFromUnit] = useState<string>("meters");
-  const [toUnit, setToUnit] = useState<string>("kilometers");
+  const [fromUnit, setFromUnit] = useState<UnitType>("meters");
+  const [toUnit, setToUnit] = useState<UnitType>("kilometers");
   const [result, setResult] = useState<number | null>(null);
 
   // SEO
@@ -63,12 +71,12 @@ export default function LengthConverter() {
   const handleConvert = () => {
     const numValue = parseFloat(value);
     if (!isNaN(numValue)) {
-      const converted = numValue * conversionRates[fromUnit as keyof typeof conversionRates][toUnit as keyof typeof conversionRates[typeof fromUnit]];
+      const converted = numValue * conversionRates[fromUnit][toUnit];
       setResult(converted);
     }
   };
 
-  const units = ["meters", "kilometers", "miles", "feet", "inches"];
+  const units: UnitType[] = ["meters", "kilometers", "miles", "feet", "inches"];
 
   return (
     <div className="max-w-md mx-auto p-6 space-y-6">
@@ -95,7 +103,7 @@ export default function LengthConverter() {
             <label className="block text-sm font-medium mb-2">From</label>
             <select
               value={fromUnit}
-              onChange={(e) => setFromUnit(e.target.value)}
+              onChange={(e) => setFromUnit(e.target.value as UnitType)}
               className="w-full border border-gray-300 rounded-md p-2"
             >
               {units.map((unit) => (
@@ -110,7 +118,7 @@ export default function LengthConverter() {
             <label className="block text-sm font-medium mb-2">To</label>
             <select
               value={toUnit}
-              onChange={(e) => setToUnit(e.target.value)}
+              onChange={(e) => setToUnit(e.target.value as UnitType)}
               className="w-full border border-gray-300 rounded-md p-2"
             >
               {units.map((unit) => (
