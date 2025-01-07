@@ -30,6 +30,12 @@ export default function SnowDayCalculator() {
 
       if (error) throw error;
 
+      // Log the raw weather data for verification
+      console.log('Raw Weather Data:', data);
+      console.log('Current Temperature:', data.current_temp);
+      console.log('Current Precipitation:', data.current_precip);
+      console.log('3-Day Forecast:', data.forecast);
+
       setSnowDays(data.snowDays.toString());
       setPrediction(
         `Based on current weather conditions in ${data.location}, ${data.country}, there is a ${data.probability}% chance of snow in the next few days.`
