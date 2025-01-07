@@ -29,21 +29,16 @@ export const CategoryTable = ({ categories }: CategoryTableProps) => {
     return name.replace(/\s+Tools$/i, '');
   };
 
-  const formatSubCategoryPath = (category: Category) => {
-    const parent = getParentCategory(category.parent_id);
-    if (!parent) return category.slug;
-    const parentName = formatMainCategoryName(parent.name).toLowerCase();
-    const subCategory = category.slug.replace(/^.*?\//, '');
-    return `${parentName}/${subCategory}`;
+  const formatSubCategoryName = (category: Category) => {
+    return category.name.replace(/\s+Tools$/i, '');
   };
 
   return (
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-[250px]">Main Category</TableHead>
-          <TableHead className="w-[300px]">Description</TableHead>
-          <TableHead>Sub-category</TableHead>
+          <TableHead className="w-[250px]">Category</TableHead>
+          <TableHead>Description</TableHead>
           <TableHead className="text-right">Actions</TableHead>
         </TableRow>
       </TableHeader>
@@ -55,7 +50,6 @@ export const CategoryTable = ({ categories }: CategoryTableProps) => {
                 {formatMainCategoryName(mainCategory.name)}
               </TableCell>
               <TableCell>{mainCategory.description}</TableCell>
-              <TableCell>-</TableCell>
               <TableCell className="text-right">
                 <Button variant="outline" size="sm" className="mr-2">
                   Edit
@@ -67,15 +61,10 @@ export const CategoryTable = ({ categories }: CategoryTableProps) => {
             </TableRow>
             {getSubCategories(mainCategory.id).map((subCategory) => (
               <TableRow key={subCategory.id} className="bg-muted/30">
-                <TableCell className="font-medium">
-                  <div className="w-6" />
+                <TableCell className="font-medium pl-8">
+                  {formatSubCategoryName(subCategory)}
                 </TableCell>
                 <TableCell>{subCategory.description}</TableCell>
-                <TableCell>
-                  <code className="px-2 py-1 rounded bg-muted">
-                    {formatSubCategoryPath(subCategory)}
-                  </code>
-                </TableCell>
                 <TableCell className="text-right">
                   <Button variant="outline" size="sm" className="mr-2">
                     Edit
