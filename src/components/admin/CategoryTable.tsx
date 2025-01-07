@@ -25,22 +25,11 @@ export const CategoryTable = ({ categories }: CategoryTableProps) => {
     return categories.find(cat => cat.id === parentId);
   };
 
-  const getCategoryType = (category: Category) => {
-    return isMainCategory(category) ? (
-      <Badge variant="outline" className="bg-orange-500/10 text-orange-500 border-orange-500/20">
-        Main Category
-      </Badge>
-    ) : (
-      <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500/20">
-        Sub-category
-      </Badge>
-    );
-  };
+  const getMainCategories = () => categories.filter(isMainCategory);
+  const getSubCategories = (parentId: string) => 
+    categories.filter(cat => cat.parent_id === parentId);
 
-  const formatSlug = (category: Category) => {
-    if (isMainCategory(category)) {
-      return `${category.slug}/`;
-    }
+  const formatSubCategoryPath = (category: Category) => {
     const parent = getParentCategory(category.parent_id);
     return parent ? `${parent.slug}/${category.slug}` : category.slug;
   };
@@ -49,43 +38,66 @@ export const CategoryTable = ({ categories }: CategoryTableProps) => {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-[300px]">Name</TableHead>
-          <TableHead className="w-[400px]">Description</TableHead>
-          <TableHead className="w-[200px]">Category Type</TableHead>
-          <TableHead className="w-[300px]">URL Pattern</TableHead>
+          <TableHead className="w-[250px]">Main Category</TableHead>
+          <TableHead className="w-[300px]">Description</TableHead>
+          <TableHead className="w-[250px]">Sub-category</TableHead>
+          <TableHead className="w-[250px]">Tool Slug Name</TableHead>
           <TableHead className="text-right">Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {categories.map((category) => (
-          <TableRow key={category.id} className={isSubCategory(category) ? "bg-muted/30" : ""}>
-            <TableCell className="font-medium">
-              <div className="flex items-center gap-2">
-                {isSubCategory(category) && (
-                  <>
+        {getMainCategories().map((mainCategory) => (
+          <>
+            <TableRow key={mainCategory.id}>
+              <TableCell className="font-medium">
+                {mainCategory.name}
+              </TableCell>
+              <TableCell>{mainCategory.description}</TableCell>
+              <TableCell>-</TableCell>
+              <TableCell>
+                <code className="px-2 py-1 rounded bg-muted">
+                  {mainCategory.slug}/
+                </code>
+              </TableCell>
+              <TableCell className="text-right">
+                <Button variant="outline" size="sm" className="mr-2">
+                  Edit
+                </Button>
+                <Button variant="destructive" size="sm">
+                  Delete
+                </Button>
+              </TableCell>
+            </TableRow>
+            {getSubCategories(mainCategory.id).map((subCategory) => (
+              <TableRow key={subCategory.id} className="bg-muted/30">
+                <TableCell className="font-medium">
+                  <div className="flex items-center gap-2">
                     <div className="w-6" />
                     <ArrowRight className="h-4 w-4 text-muted-foreground" />
-                  </>
-                )}
-                {category.name}
-              </div>
-            </TableCell>
-            <TableCell>{category.description}</TableCell>
-            <TableCell>{getCategoryType(category)}</TableCell>
-            <TableCell>
-              <code className="px-2 py-1 rounded bg-muted">
-                {formatSlug(category)}
-              </code>
-            </TableCell>
-            <TableCell className="text-right">
-              <Button variant="outline" size="sm" className="mr-2">
-                Edit
-              </Button>
-              <Button variant="destructive" size="sm">
-                Delete
-              </Button>
-            </TableCell>
-          </TableRow>
+                  </div>
+                </TableCell>
+                <TableCell>{subCategory.description}</TableCell>
+                <TableCell>
+                  <code className="px-2 py-1 rounded bg-muted">
+                    {formatSubCategoryPath(subCategory)}
+                  </code>
+                </TableCell>
+                <TableCell>
+                  <code className="px-2 py-1 rounded bg-muted">
+                    {`${mainCategory.slug}/${subCategory.slug}/[tool-slug]`}
+                  </code>
+                </TableCell>
+                <TableCell className="text-right">
+                  <Button variant="outline" size="sm" className="mr-2">
+                    Edit
+                  </Button>
+                  <Button variant="destructive" size="sm">
+                    Delete
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </>
         ))}
       </TableBody>
     </Table>
