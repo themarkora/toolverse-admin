@@ -8,25 +8,34 @@ import { Textarea } from "@/components/ui/textarea";
 import { Plus } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-interface AddToolFormValues {
-  name: string;
-  description: string;
-}
+const formSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  description: z.string().optional(),
+});
+
+type FormValues = z.infer<typeof formSchema>;
 
 export const AddToolDialog = ({ onToolAdded }: { onToolAdded: () => void }) => {
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
-  const form = useForm<AddToolFormValues>();
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      description: "",
+    },
+  });
 
-  const onSubmit = async (data: AddToolFormValues) => {
+  const onSubmit = async (data: FormValues) => {
     try {
-      // Create a URL-friendly slug from the tool name
       const slug = data.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
       const { error } = await supabase.from('tools').insert({
         name: data.name,
-        description: data.description,
+        description: data.description || null,
         slug: slug,
       });
 
