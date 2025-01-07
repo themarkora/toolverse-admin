@@ -14,24 +14,41 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
+          is_active: boolean
           name: string
+          parent_id: string | null
+          slug: string
           updated_at: string
         }
         Insert: {
           created_at?: string
           description?: string | null
           id?: string
+          is_active?: boolean
           name: string
+          parent_id?: string | null
+          slug: string
           updated_at?: string
         }
         Update: {
           created_at?: string
           description?: string | null
           id?: string
+          is_active?: boolean
           name?: string
+          parent_id?: string | null
+          slug?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "categories_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       tools: {
         Row: {
@@ -40,6 +57,7 @@ export type Database = {
           description: string | null
           id: string
           name: string
+          slug: string
           updated_at: string
           url: string | null
         }
@@ -49,6 +67,7 @@ export type Database = {
           description?: string | null
           id?: string
           name: string
+          slug: string
           updated_at?: string
           url?: string | null
         }
@@ -58,6 +77,7 @@ export type Database = {
           description?: string | null
           id?: string
           name?: string
+          slug?: string
           updated_at?: string
           url?: string | null
         }
