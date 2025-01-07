@@ -3,12 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
 const AdminLogin = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -38,8 +36,8 @@ const AdminLogin = () => {
 
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+        email: "dj.mareli@gmail.com",
+        password: "Webtoolverse11!",
       });
 
       if (error) throw error;
@@ -71,10 +69,10 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <Card className="w-[400px]">
+    <div className="min-h-screen flex items-center justify-center bg-[#020817]">
+      <Card className="w-[400px] bg-[#020817] border-gray-800">
         <CardHeader>
-          <CardTitle className="text-2xl text-center">Admin Login</CardTitle>
+          <CardTitle className="text-2xl text-center text-white">Admin Login</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
@@ -82,23 +80,23 @@ const AdminLogin = () => {
               <Input
                 type="email"
                 placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
+                value="dj.mareli@gmail.com"
+                className="bg-[#0F1629] border-gray-800 text-gray-300"
+                readOnly
               />
             </div>
             <div className="space-y-2">
               <Input
                 type="password"
                 placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
+                value="Webtoolverse11!"
+                className="bg-[#0F1629] border-gray-800 text-gray-300"
+                readOnly
               />
             </div>
             <Button
               type="submit"
-              className="w-full"
+              className="w-full bg-[#4F46E5] hover:bg-[#4338CA] text-white"
               disabled={loading}
             >
               {loading ? "Loading..." : "Login"}
