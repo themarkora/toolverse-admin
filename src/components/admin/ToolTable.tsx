@@ -1,3 +1,8 @@
+import { useState } from "react";
+import { Tool } from "@/types/tools";
+import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 import {
   Table,
   TableBody,
@@ -6,11 +11,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Tool } from "@/types/tools";
-import { useState } from "react";
-import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import { EditToolDialog } from "./EditToolDialog";
 
 interface ToolTableProps {
@@ -18,34 +18,36 @@ interface ToolTableProps {
   onToolUpdated: () => void;
 }
 
-export const ToolTable = ({ tools, onToolUpdated }: ToolTableProps) => {
-  const [editingTool, setEditingTool] = useState<Tool | null>(null);
+export function ToolTable({ tools, onToolUpdated }: ToolTableProps) {
   const { toast } = useToast();
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async (id: string) => {
-    const { error } = await supabase
-      .from('tools')
-      .delete()
-      .eq('id', id);
+    try {
+      setIsDeleting(true);
+      const { error } = await supabase.from("tools").delete().eq("id", id);
 
-    if (error) {
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Tool deleted successfully",
+      });
+      
+      onToolUpdated();
+    } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: error.message,
+        description: error.message || "Failed to delete tool",
       });
-      return;
+    } finally {
+      setIsDeleting(false);
     }
-
-    toast({
-      title: "Success",
-      description: "Tool deleted successfully",
-    });
-    onToolUpdated();
   };
 
   return (
-    <>
+    <div className="rounded-md border">
       <Table>
         <TableHeader>
           <TableRow>
@@ -58,42 +60,31 @@ export const ToolTable = ({ tools, onToolUpdated }: ToolTableProps) => {
         <TableBody>
           {tools.map((tool) => (
             <TableRow key={tool.id}>
-              <TableCell className="font-medium">{tool.name}</TableCell>
+              <TableCell>{tool.name}</TableCell>
               <TableCell>{tool.description}</TableCell>
-              <TableCell>
-                <code className="px-2 py-1 rounded bg-muted">
-                  {tool.slug}
-                </code>
-              </TableCell>
-              <TableCell className="text-right">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="mr-2"
-                  onClick={() => setEditingTool(tool)}
-                >
-                  Edit
-                </Button>
-                <Button 
-                  variant="destructive" 
+              <TableCell>{tool.slug}</TableCell>
+              <TableCell className="text-right space-x-2">
+                <EditToolDialog tool={tool} onToolUpdated={onToolUpdated} />
+                <Button
+                  variant="destructive"
                   size="sm"
                   onClick={() => handleDelete(tool.id)}
+                  disabled={isDeleting}
                 >
                   Delete
                 </Button>
               </TableCell>
             </TableRow>
           ))}
+          {tools.length === 0 && (
+            <TableRow>
+              <TableCell colSpan={4} className="text-center py-4">
+                No tools found
+              </TableCell>
+            </TableRow>
+          )}
         </TableBody>
       </Table>
-
-      {editingTool && (
-        <EditToolDialog
-          tool={editingTool}
-          onClose={() => setEditingTool(null)}
-          onToolUpdated={onToolUpdated}
-        />
-      )}
-    </>
+    </div>
   );
-};
+}
