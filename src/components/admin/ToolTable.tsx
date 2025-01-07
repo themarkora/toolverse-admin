@@ -20,7 +20,7 @@ export const ToolTable = ({ tools }: ToolTableProps) => {
         <TableRow>
           <TableHead>Name</TableHead>
           <TableHead>Description</TableHead>
-          <TableHead>URL</TableHead>
+          <TableHead>Slug</TableHead>
           <TableHead className="text-right">Actions</TableHead>
         </TableRow>
       </TableHeader>
@@ -31,7 +31,7 @@ export const ToolTable = ({ tools }: ToolTableProps) => {
             <TableCell>{tool.description}</TableCell>
             <TableCell>
               <code className="px-2 py-1 rounded bg-muted">
-                /tools/{tool.slug}
+                {tool.slug}
               </code>
             </TableCell>
             <TableCell className="text-right">
