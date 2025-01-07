@@ -1,50 +1,95 @@
-import { Navbar } from "@/components/Navbar";
-import { ToolCard } from "@/components/ToolCard";
+import { useState } from "react";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { convertLength, getAvailableUnits } from "@/lib/converter";
 
-// Temporary mock data
-const tools = [
-  {
-    title: "Color Picker",
-    description: "A simple but powerful color picking tool with various formats support.",
-    category: "Design",
-  },
-  {
-    title: "JSON Formatter",
-    description: "Format and validate your JSON with this easy-to-use tool.",
-    category: "Development",
-  },
-  {
-    title: "Image Optimizer",
-    description: "Optimize your images for the web without losing quality.",
-    category: "Media",
-  },
-];
+export default function Index() {
+  const [value, setValue] = useState<string>("");
+  const [fromUnit, setFromUnit] = useState<string>("meters");
+  const [toUnit, setToUnit] = useState<string>("feet");
+  const [result, setResult] = useState<number | null>(null);
 
-const Index = () => {
+  const units = getAvailableUnits();
+
+  const handleConvert = () => {
+    const numValue = parseFloat(value);
+    if (!isNaN(numValue)) {
+      const converted = convertLength(numValue, fromUnit, toUnit);
+      setResult(converted);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      
-      <main className="container mx-auto px-4 py-8">
-        <div className="space-y-8">
-          <div className="text-center space-y-4">
-            <h1 className="text-4xl font-bold tracking-tight text-foreground">
-              Web Tools Collection
-            </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              A curated collection of useful web tools to help streamline your workflow.
-            </p>
+    <div className="container mx-auto px-4 py-8">
+      <Card className="p-6 max-w-xl mx-auto">
+        <h1 className="text-2xl font-bold mb-6">Length Converter</h1>
+        
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Value</label>
+            <Input
+              type="number"
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              placeholder="Enter value to convert"
+            />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {tools.map((tool, index) => (
-              <ToolCard key={index} {...tool} />
-            ))}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">From</label>
+              <Select value={fromUnit} onValueChange={setFromUnit}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {units.map((unit) => (
+                    <SelectItem key={unit} value={unit}>
+                      {unit}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">To</label>
+              <Select value={toUnit} onValueChange={setToUnit}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {units.map((unit) => (
+                    <SelectItem key={unit} value={unit}>
+                      {unit}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
+
+          <Button onClick={handleConvert} className="w-full">
+            Convert
+          </Button>
+
+          {result !== null && (
+            <div className="mt-4 p-4 bg-muted rounded-lg">
+              <p className="text-center">
+                {value} {fromUnit} = {result.toFixed(6)} {toUnit}
+              </p>
+            </div>
+          )}
         </div>
-      </main>
+      </Card>
     </div>
   );
-};
-
-export default Index;
+}
