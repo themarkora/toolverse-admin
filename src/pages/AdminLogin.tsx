@@ -24,7 +24,7 @@ const AdminLogin = () => {
         .from('user_roles')
         .select('role')
         .eq('user_id', session.user.id)
-        .maybeSingle();
+        .single();
 
       if (userRole?.role === 'admin') {
         navigate('/admin');
@@ -50,15 +50,11 @@ const AdminLogin = () => {
         throw new Error('No user data returned');
       }
 
-      const { data: userRole, error: roleError } = await supabase
+      const { data: userRole } = await supabase
         .from('user_roles')
         .select('role')
         .eq('user_id', authData.user.id)
-        .maybeSingle();
-
-      if (roleError) {
-        throw roleError;
-      }
+        .single();
 
       if (userRole?.role !== 'admin') {
         throw new Error('Unauthorized access - Admin privileges required');
