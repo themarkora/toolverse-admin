@@ -7,7 +7,7 @@ export const generateUniqueSlug = async (baseName: string): Promise<string> => {
     .from('tools')
     .select('slug')
     .eq('slug', baseSlug)
-    .single();
+    .maybeSingle();
 
   if (!existingTool) {
     return baseSlug;
@@ -21,7 +21,7 @@ export const generateUniqueSlug = async (baseName: string): Promise<string> => {
       .from('tools')
       .select('slug')
       .eq('slug', newSlug)
-      .single();
+      .maybeSingle();
 
     if (!existingToolWithNumber) {
       return newSlug;

@@ -39,7 +39,7 @@ export function EditToolDialog({ tool, onToolUpdated }: EditToolDialogProps) {
           .from("tools")
           .select("id")
           .eq("slug", formData.slug)
-          .single();
+          .maybeSingle();
 
         if (existingTool) {
           throw new Error("A tool with this slug already exists");
