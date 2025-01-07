@@ -1,12 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error(
-    'Missing Supabase credentials. Please ensure you have set both VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your project settings.'
-  );
-}
+const supabaseUrl = "https://vquxyeqhjzoiknultdji.supabase.co";
+const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZxdXh5ZXFoanpvaWtudWx0ZGppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzYyMTU2OTUsImV4cCI6MjA1MTc5MTY5NX0.MfdwqTu-PUukzuiEai2aDInl2s9m0NMKU5XZXb0JpqU";
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
