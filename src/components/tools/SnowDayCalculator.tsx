@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Snowflake } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { Snowflake, MapPin } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { LocationInput } from "./snow-day/LocationInput";
+import { SnowDaysInput } from "./snow-day/SnowDaysInput";
+import { PredictionResult } from "./snow-day/PredictionResult";
 
 export default function SnowDayCalculator() {
   const [location, setLocation] = useState("");
@@ -46,7 +48,6 @@ export default function SnowDayCalculator() {
   return (
     <div className="min-h-[400px] p-8 bg-gradient-to-br from-[#2e3748] to-[#161b26] rounded-xl">
       <div className="max-w-3xl mx-auto text-center space-y-8">
-        {/* Header */}
         <div className="space-y-4">
           <div className="w-24 h-24 mx-auto bg-[#ff7171] rounded-full flex items-center justify-center">
             <Snowflake className="w-12 h-12 text-white" />
@@ -59,27 +60,11 @@ export default function SnowDayCalculator() {
           </p>
         </div>
 
-        {/* Main Card */}
         <Card className="bg-white/10 backdrop-blur-lg border border-white/20 p-6">
-          <div className="relative">
-            <Input
-              type="text"
-              placeholder="Enter Location (e.g., London, UK)"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              className="bg-white/5 border-white/10 text-white placeholder:text-gray-400 pr-10"
-            />
-            <MapPin className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-          </div>
+          <LocationInput location={location} onChange={setLocation} />
 
           <div className="mt-4">
-            <Input
-              type="text"
-              placeholder="Predicted Snow Days"
-              value={snowDays}
-              readOnly
-              className="bg-white/5 border-white/10 text-white placeholder:text-gray-400"
-            />
+            <SnowDaysInput snowDays={snowDays} />
           </div>
 
           <Button 
@@ -91,14 +76,7 @@ export default function SnowDayCalculator() {
           </Button>
         </Card>
 
-        {/* Prediction Result */}
-        {prediction && (
-          <div className="animate-fadeIn">
-            <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-lg p-4">
-              <p className="text-white text-center">{prediction}</p>
-            </div>
-          </div>
-        )}
+        <PredictionResult prediction={prediction} />
       </div>
     </div>
   );
