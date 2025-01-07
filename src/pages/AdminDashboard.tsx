@@ -4,9 +4,9 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/Navbar";
-import { Plus } from "lucide-react";
 import { StatsCards } from "@/components/admin/StatsCards";
 import { ToolTable } from "@/components/admin/ToolTable";
+import { AddToolDialog } from "@/components/admin/AddToolDialog";
 import { Tool } from "@/types/tools";
 import { Card } from "@/components/ui/card";
 
@@ -116,9 +116,7 @@ const AdminDashboard = () => {
         <div>
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-semibold">Tools</h2>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" /> Add Tool
-            </Button>
+            <AddToolDialog onToolAdded={fetchTools} />
           </div>
           <Card>
             <ToolTable tools={tools} />
