@@ -16,21 +16,11 @@ interface CategoryTableProps {
 export const CategoryTable = ({ categories }: CategoryTableProps) => {
   const isMainCategory = (category: Category) => !category.parent_id;
 
-  const getParentCategory = (parentId: string | null) => {
-    if (!parentId) return null;
-    return categories.find(cat => cat.id === parentId);
-  };
-
-  const getMainCategories = () => categories.filter(isMainCategory);
   const getSubCategories = (parentId: string) => 
     categories.filter(cat => cat.parent_id === parentId);
 
-  const formatMainCategoryName = (name: string) => {
+  const formatCategoryName = (name: string) => {
     return name.replace(/\s+Tools$/i, '');
-  };
-
-  const formatSubCategoryName = (category: Category) => {
-    return category.name.replace(/\s+Tools$/i, '');
   };
 
   return (
@@ -39,17 +29,23 @@ export const CategoryTable = ({ categories }: CategoryTableProps) => {
         <TableRow>
           <TableHead className="w-[250px]">Category</TableHead>
           <TableHead>Description</TableHead>
+          <TableHead>URL Path</TableHead>
           <TableHead className="text-right">Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {getMainCategories().map((mainCategory) => (
+        {categories.filter(isMainCategory).map((mainCategory) => (
           <>
             <TableRow key={mainCategory.id}>
               <TableCell className="font-medium">
-                {formatMainCategoryName(mainCategory.name)}
+                {formatCategoryName(mainCategory.name)}
               </TableCell>
               <TableCell>{mainCategory.description}</TableCell>
+              <TableCell>
+                <code className="px-2 py-1 rounded bg-muted">
+                  /tools/{mainCategory.slug}
+                </code>
+              </TableCell>
               <TableCell className="text-right">
                 <Button variant="outline" size="sm" className="mr-2">
                   Edit
@@ -62,9 +58,14 @@ export const CategoryTable = ({ categories }: CategoryTableProps) => {
             {getSubCategories(mainCategory.id).map((subCategory) => (
               <TableRow key={subCategory.id} className="bg-muted/30">
                 <TableCell className="font-medium pl-8">
-                  {formatSubCategoryName(subCategory)}
+                  {formatCategoryName(subCategory.name)}
                 </TableCell>
                 <TableCell>{subCategory.description}</TableCell>
+                <TableCell>
+                  <code className="px-2 py-1 rounded bg-muted">
+                    /tools/{subCategory.slug}
+                  </code>
+                </TableCell>
                 <TableCell className="text-right">
                   <Button variant="outline" size="sm" className="mr-2">
                     Edit
