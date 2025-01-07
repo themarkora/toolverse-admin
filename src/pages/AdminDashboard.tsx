@@ -119,7 +119,7 @@ const AdminDashboard = () => {
             <AddToolDialog onToolAdded={fetchTools} />
           </div>
           <Card>
-            <ToolTable tools={tools} />
+            <ToolTable tools={tools} onToolUpdated={fetchTools} />
           </Card>
         </div>
       </div>
