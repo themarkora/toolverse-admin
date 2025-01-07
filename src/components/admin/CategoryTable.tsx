@@ -9,8 +9,6 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Category } from "@/types/categories";
-import { Badge } from "@/components/ui/badge";
-import { ArrowRight } from "lucide-react";
 
 interface CategoryTableProps {
   categories: Category[];
@@ -31,7 +29,15 @@ export const CategoryTable = ({ categories }: CategoryTableProps) => {
 
   const formatSubCategoryPath = (category: Category) => {
     const parent = getParentCategory(category.parent_id);
-    return parent ? `${parent.slug}/${category.slug}` : category.slug;
+    if (!parent) return category.slug;
+    // Remove any "Tools" suffix and avoid duplicate category names
+    const parentSlug = parent.slug.replace(/\-?tools$/i, '');
+    return `${parentSlug}/${category.slug}`;
+  };
+
+  const formatMainCategoryName = (name: string) => {
+    // Remove any "Tools" suffix
+    return name.replace(/\s+Tools$/i, '');
   };
 
   return (
@@ -50,13 +56,13 @@ export const CategoryTable = ({ categories }: CategoryTableProps) => {
           <>
             <TableRow key={mainCategory.id}>
               <TableCell className="font-medium">
-                {mainCategory.name}
+                {formatMainCategoryName(mainCategory.name)}
               </TableCell>
               <TableCell>{mainCategory.description}</TableCell>
               <TableCell>-</TableCell>
               <TableCell>
                 <code className="px-2 py-1 rounded bg-muted">
-                  {mainCategory.slug}/
+                  {mainCategory.slug.replace(/\-?tools$/i, '')}/
                 </code>
               </TableCell>
               <TableCell className="text-right">
@@ -71,10 +77,7 @@ export const CategoryTable = ({ categories }: CategoryTableProps) => {
             {getSubCategories(mainCategory.id).map((subCategory) => (
               <TableRow key={subCategory.id} className="bg-muted/30">
                 <TableCell className="font-medium">
-                  <div className="flex items-center gap-2">
-                    <div className="w-6" />
-                    <ArrowRight className="h-4 w-4 text-muted-foreground" />
-                  </div>
+                  <div className="w-6" />
                 </TableCell>
                 <TableCell>{subCategory.description}</TableCell>
                 <TableCell>
@@ -84,7 +87,7 @@ export const CategoryTable = ({ categories }: CategoryTableProps) => {
                 </TableCell>
                 <TableCell>
                   <code className="px-2 py-1 rounded bg-muted">
-                    {`${mainCategory.slug}/${subCategory.slug}/[tool-slug]`}
+                    {`${formatSubCategoryPath(subCategory)}/[tool-slug]`}
                   </code>
                 </TableCell>
                 <TableCell className="text-right">
