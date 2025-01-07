@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   Table,
   TableBody,
@@ -27,17 +26,15 @@ export const CategoryTable = ({ categories }: CategoryTableProps) => {
   const getSubCategories = (parentId: string) => 
     categories.filter(cat => cat.parent_id === parentId);
 
+  const formatMainCategoryName = (name: string) => {
+    return name.replace(/\s+Tools$/i, '');
+  };
+
   const formatSubCategoryPath = (category: Category) => {
     const parent = getParentCategory(category.parent_id);
     if (!parent) return category.slug;
-    // Remove any "Tools" suffix and avoid duplicate category names
-    const parentSlug = parent.slug.replace(/\-?tools$/i, '');
-    return `${parentSlug}/${category.slug}`;
-  };
-
-  const formatMainCategoryName = (name: string) => {
-    // Remove any "Tools" suffix
-    return name.replace(/\s+Tools$/i, '');
+    const parentName = parent.slug.replace(/\-?tools$/i, '');
+    return `${parentName}/${category.slug}`;
   };
 
   return (
@@ -87,7 +84,7 @@ export const CategoryTable = ({ categories }: CategoryTableProps) => {
                 </TableCell>
                 <TableCell>
                   <code className="px-2 py-1 rounded bg-muted">
-                    {`${formatSubCategoryPath(subCategory)}/[tool-slug]`}
+                    [tool-slug]
                   </code>
                 </TableCell>
                 <TableCell className="text-right">
@@ -96,7 +93,7 @@ export const CategoryTable = ({ categories }: CategoryTableProps) => {
                   </Button>
                   <Button variant="destructive" size="sm">
                     Delete
-                  </Button>
+                </Button>
                 </TableCell>
               </TableRow>
             ))}
