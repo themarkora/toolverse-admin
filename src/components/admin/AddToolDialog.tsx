@@ -29,9 +29,43 @@ export const AddToolDialog = ({ onToolAdded }: { onToolAdded: () => void }) => {
     },
   });
 
+  const generateUniqueSlug = async (baseName: string): Promise<string> => {
+    const baseSlug = baseName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    
+    // Check if the base slug exists
+    const { data: existingTool } = await supabase
+      .from('tools')
+      .select('slug')
+      .eq('slug', baseSlug)
+      .single();
+
+    if (!existingTool) {
+      return baseSlug;
+    }
+
+    // If slug exists, append a number until we find a unique one
+    let counter = 1;
+    let newSlug = `${baseSlug}-${counter}`;
+    
+    while (true) {
+      const { data: existingToolWithNumber } = await supabase
+        .from('tools')
+        .select('slug')
+        .eq('slug', newSlug)
+        .single();
+
+      if (!existingToolWithNumber) {
+        return newSlug;
+      }
+
+      counter++;
+      newSlug = `${baseSlug}-${counter}`;
+    }
+  };
+
   const onSubmit = async (data: FormValues) => {
     try {
-      const slug = data.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      const slug = await generateUniqueSlug(data.name);
 
       const { error } = await supabase.from('tools').insert({
         name: data.name,
