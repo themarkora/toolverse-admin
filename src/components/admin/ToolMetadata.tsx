@@ -75,16 +75,8 @@ export function ToolMetadata({ tool, onUpdate }: ToolMetadataProps) {
       setIsPublishing(false);
     }
   };
-
-  // Get the current hostname
-  const isLocalPreview = window.location.hostname.includes('lovableproject.com');
-  
-  // Use the appropriate base URL based on the environment
-  const baseUrl = isLocalPreview 
-    ? window.location.origin  // Use current origin for preview
-    : 'https://webtoolverse.com'; // Use production URL otherwise
     
-  const publicUrl = `${baseUrl}/tools/${tool.slug}`;
+  const publicUrl = `https://webtoolverse.com/tools/${tool.slug}`;
 
   return (
     <div className="space-y-4">
@@ -121,11 +113,6 @@ export function ToolMetadata({ tool, onUpdate }: ToolMetadataProps) {
               {publicUrl}
             </a>
           </p>
-          {isLocalPreview && (
-            <p className="mt-1 text-sm text-yellow-600">
-              Note: You are viewing this in preview mode. The tool will be available at webtoolverse.com in production.
-            </p>
-          )}
         </div>
 
         <div>
