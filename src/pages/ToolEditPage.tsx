@@ -38,7 +38,6 @@ export default function ToolEditPage() {
   }, [slug, navigate, toast]);
 
   const handleToolUpdate = () => {
-    // Refresh tool data
     window.location.reload();
   };
 
@@ -57,9 +56,17 @@ export default function ToolEditPage() {
           <h1 className="text-2xl font-bold">{tool.name}</h1>
           <p className="text-muted-foreground">Edit tool configuration</p>
         </div>
-        <Button variant="outline" onClick={() => navigate("/admin")}>
-          Back to Admin
-        </Button>
+        <div className="space-x-4">
+          <Button variant="outline" onClick={() => navigate("/admin")}>
+            Back to Admin
+          </Button>
+          <Button 
+            variant="default" 
+            onClick={() => window.open(`/tools/${tool.slug}`, '_blank')}
+          >
+            View Live Tool
+          </Button>
+        </div>
       </div>
 
       <div className="grid gap-8 md:grid-cols-2">
