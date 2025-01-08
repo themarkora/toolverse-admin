@@ -1,4 +1,4 @@
-import { Suspense, useEffect } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { getToolComponent } from '../tools/registry';
 import { Navigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
@@ -9,41 +9,61 @@ interface ToolPreviewProps {
 }
 
 export function ToolPreview({ slug, isPublic = false }: ToolPreviewProps) {
+  const [isLoading, setIsLoading] = useState(true);
+  const [toolExists, setToolExists] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  
   console.log("ToolPreview rendering for slug:", slug, "isPublic:", isPublic);
   
   useEffect(() => {
     const checkToolPublished = async () => {
       try {
+        console.log("Checking tool publication status for slug:", slug);
         const { data, error } = await supabase
           .from("tools")
           .select("published, published_at")
           .eq("slug", slug)
           .single();
 
-        console.log("Tool publication status:", {
-          slug,
-          data,
-          error: error?.message
-        });
+        if (error) {
+          console.error("Error fetching tool:", error.message);
+          setError(error.message);
+          return;
+        }
+
+        console.log("Tool data from database:", data);
+        setToolExists(true);
+        
+        if (isPublic && !data?.published) {
+          console.log("Tool is not published, redirecting...");
+          setError("Tool is not published");
+          return;
+        }
+
       } catch (err) {
         console.error("Error checking tool status:", err);
+        setError(err instanceof Error ? err.message : "Unknown error");
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    if (isPublic) {
-      checkToolPublished();
-    }
+    checkToolPublished();
   }, [slug, isPublic]);
   
   const Component = getToolComponent(slug);
   
-  if (!Component) {
-    console.error("Tool component not found for slug:", slug);
+  if (isLoading) {
+    return <div className="p-4 text-center">Loading tool data...</div>;
+  }
+
+  if (error || !Component) {
+    console.error("Tool error:", error || "Component not found for slug: " + slug);
     return isPublic ? (
       <Navigate to="/" replace />
     ) : (
       <div className="p-4 text-center text-gray-500">
-        Tool not found or not available
+        {error || "Tool not found or not available"}
       </div>
     );
   }

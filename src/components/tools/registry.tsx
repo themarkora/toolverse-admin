@@ -4,7 +4,7 @@ import LengthConverter from './LengthConverter';
 const toolComponents = {
   'snow-day-calculator': SnowDayCalculator,
   'length-converter': LengthConverter,
-};
+} as const;
 
 export const getToolComponent = (slug: string) => {
   console.log("Getting tool component for slug:", slug);
