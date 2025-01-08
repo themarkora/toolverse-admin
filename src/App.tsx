@@ -21,7 +21,7 @@ const ToolWrapper = () => {
   });
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<div>Loading tool...</div>}>
       <ToolComponent />
     </Suspense>
   );

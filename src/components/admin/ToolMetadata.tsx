@@ -102,7 +102,14 @@ export function ToolMetadata({ tool, onUpdate }: ToolMetadataProps) {
         <div>
           <label className="text-sm font-medium">Public URL</label>
           <p className="mt-1">
-            {window.location.origin}/tools/{tool.slug}
+            <a 
+              href={`/tools/${tool.slug}`} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline"
+            >
+              /tools/{tool.slug}
+            </a>
           </p>
         </div>
 
