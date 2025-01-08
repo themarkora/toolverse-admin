@@ -68,7 +68,7 @@ const AdminDashboard = () => {
   const fetchTools = async () => {
     const { data, error } = await supabase
       .from('tools')
-      .select('*')
+      .select('id, name, description, slug, created_at, updated_at, published, published_at, embedded_code')
       .order('name');
 
     if (error) {

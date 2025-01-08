@@ -17,7 +17,7 @@ export default function ToolEditPage() {
     const fetchTool = async () => {
       const { data, error } = await supabase
         .from("tools")
-        .select("*")
+        .select('id, name, description, slug, created_at, updated_at, published, published_at, embedded_code')
         .eq("slug", slug)
         .single();
 
