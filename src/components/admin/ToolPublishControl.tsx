@@ -16,16 +16,21 @@ export function ToolPublishControl({ tool, onUpdate }: ToolPublishControlProps) 
   const handlePublish = async () => {
     try {
       setIsPublishing(true);
-      const { error } = await supabase
+      console.log("Publishing tool:", tool.id, "Current published state:", tool.published);
+      
+      const { data, error } = await supabase
         .from("tools")
         .update({
           published: !tool.published,
           published_at: !tool.published ? new Date().toISOString() : null,
           updated_at: new Date().toISOString(),
         })
-        .eq("id", tool.id);
+        .eq("id", tool.id)
+        .select();
 
       if (error) throw error;
+
+      console.log("Publish response:", data);
 
       toast({
         title: "Success",
@@ -36,6 +41,7 @@ export function ToolPublishControl({ tool, onUpdate }: ToolPublishControlProps) 
       
       onUpdate();
     } catch (error: any) {
+      console.error("Publish error:", error);
       toast({
         variant: "destructive",
         title: "Error",

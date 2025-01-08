@@ -17,10 +17,11 @@ export function ToolMetadata({ tool, onUpdate }: ToolMetadataProps) {
   const navigate = useNavigate();
   const [isSaving, setIsSaving] = useState(false);
 
-  // Check authentication status when component mounts
   useEffect(() => {
     checkAuth();
-  }, []);
+    // Debug log to verify tool data
+    console.log("Current tool data:", tool);
+  }, [tool]);
 
   const checkAuth = async () => {
     const { data: { session }, error } = await supabase.auth.getSession();
@@ -76,8 +77,11 @@ export function ToolMetadata({ tool, onUpdate }: ToolMetadataProps) {
   };
 
   const handleViewLive = () => {
-    // Always open the production URL in a new tab
-    window.open(`https://webtoolverse.com/tools/${tool.slug}`, '_blank');
+    // For local development, use the current domain
+    const domain = window.location.hostname === 'localhost' 
+      ? window.location.origin 
+      : 'https://webtoolverse.com';
+    window.open(`${domain}/tools/${tool.slug}`, '_blank');
   };
 
   return (
@@ -107,6 +111,21 @@ export function ToolMetadata({ tool, onUpdate }: ToolMetadataProps) {
 
         <ToolPublishControl tool={tool} onUpdate={onUpdate} />
       </div>
+
+      {/* Debug information */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="mt-4 p-4 bg-gray-100 rounded">
+          <h3 className="font-semibold">Debug Info:</h3>
+          <pre className="text-xs mt-2">
+            {JSON.stringify({
+              id: tool.id,
+              slug: tool.slug,
+              published: tool.published,
+              published_at: tool.published_at
+            }, null, 2)}
+          </pre>
+        </div>
+      )}
     </div>
   );
 }
