@@ -16,6 +16,8 @@ export type Database = {
           embedded_code: string | null
           id: string
           name: string
+          published: boolean | null
+          published_at: string | null
           slug: string
           updated_at: string
         }
@@ -25,6 +27,8 @@ export type Database = {
           embedded_code?: string | null
           id?: string
           name: string
+          published?: boolean | null
+          published_at?: string | null
           slug: string
           updated_at?: string
         }
@@ -34,6 +38,8 @@ export type Database = {
           embedded_code?: string | null
           id?: string
           name?: string
+          published?: boolean | null
+          published_at?: string | null
           slug?: string
           updated_at?: string
         }

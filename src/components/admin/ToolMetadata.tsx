@@ -12,6 +12,7 @@ interface ToolMetadataProps {
 export function ToolMetadata({ tool, onUpdate }: ToolMetadataProps) {
   const { toast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
 
   const handleSave = async () => {
     try {
@@ -42,6 +43,39 @@ export function ToolMetadata({ tool, onUpdate }: ToolMetadataProps) {
     }
   };
 
+  const handlePublish = async () => {
+    try {
+      setIsPublishing(true);
+      const { error } = await supabase
+        .from("tools")
+        .update({
+          published: !tool.published,
+          published_at: !tool.published ? new Date().toISOString() : null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", tool.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: tool.published 
+          ? "Tool unpublished successfully"
+          : "Tool published successfully! It's now live at /tools/" + tool.slug,
+      });
+      
+      onUpdate();
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message || "Failed to publish tool",
+      });
+    } finally {
+      setIsPublishing(false);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div>
@@ -68,17 +102,39 @@ export function ToolMetadata({ tool, onUpdate }: ToolMetadataProps) {
         <div>
           <label className="text-sm font-medium">Public URL</label>
           <p className="mt-1">
-            {window.location.origin}/{tool.slug}
+            {window.location.origin}/tools/{tool.slug}
+          </p>
+        </div>
+
+        <div>
+          <label className="text-sm font-medium">Status</label>
+          <p className="mt-1">
+            {tool.published ? (
+              <span className="text-green-600">Published</span>
+            ) : (
+              <span className="text-gray-600">Draft</span>
+            )}
           </p>
         </div>
       </div>
 
-      <Button 
-        onClick={handleSave} 
-        disabled={isSaving}
-      >
-        {isSaving ? "Saving..." : "Update Metadata"}
-      </Button>
+      <div className="flex space-x-4">
+        <Button 
+          onClick={handleSave} 
+          disabled={isSaving}
+          variant="outline"
+        >
+          {isSaving ? "Saving..." : "Update Metadata"}
+        </Button>
+
+        <Button 
+          onClick={handlePublish} 
+          disabled={isPublishing}
+          variant={tool.published ? "destructive" : "default"}
+        >
+          {isPublishing ? "Processing..." : tool.published ? "Unpublish" : "Publish"}
+        </Button>
+      </div>
     </div>
   );
 }

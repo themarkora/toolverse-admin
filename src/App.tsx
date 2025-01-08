@@ -13,7 +13,7 @@ function App() {
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/tools/:slug/edit" element={<ToolEditPage />} />
-        <Route path="/snow-day-calculator" element={<SnowDayCalculator />} />
+        <Route path="/tools/:slug" element={<SnowDayCalculator />} />
       </Routes>
     </Router>
   );
