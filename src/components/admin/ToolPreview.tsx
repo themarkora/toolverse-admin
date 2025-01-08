@@ -8,15 +8,9 @@ interface ToolPreviewProps {
 }
 
 export function ToolPreview({ slug, isPublic = false }: ToolPreviewProps) {
-  const ToolComponent = lazy(() => {
-    const component = getToolComponent(slug);
-    if (!component) {
-      throw new Error(`Tool not found: ${slug}`);
-    }
-    return Promise.resolve({ default: component });
-  });
-
-  if (!ToolComponent) {
+  const component = getToolComponent(slug);
+  
+  if (!component) {
     return isPublic ? (
       <Navigate to="/404" replace />
     ) : (
@@ -25,6 +19,8 @@ export function ToolPreview({ slug, isPublic = false }: ToolPreviewProps) {
       </div>
     );
   }
+
+  const ToolComponent = lazy(() => Promise.resolve({ default: component }));
 
   return (
     <div className={`w-full ${isPublic ? 'min-h-screen' : 'border rounded-lg p-4'}`}>

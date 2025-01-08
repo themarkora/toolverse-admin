@@ -1,8 +1,9 @@
-import { lazy } from 'react';
+import SnowDayCalculator from './SnowDayCalculator';
+import LengthConverter from './LengthConverter';
 
 const toolComponents = {
-  'snow-day-calculator': lazy(() => import('./SnowDayCalculator')),
-  'length-converter': lazy(() => import('./LengthConverter')),
+  'snow-day-calculator': SnowDayCalculator,
+  'length-converter': LengthConverter,
 } as const;
 
 export type ToolSlug = keyof typeof toolComponents;
