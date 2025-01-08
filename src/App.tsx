@@ -10,10 +10,12 @@ import { useParams } from "react-router-dom";
 // Tool wrapper component to dynamically load the correct tool
 const ToolWrapper = () => {
   const { slug } = useParams();
+  if (!slug) return null;
+  
   const ToolComponent = lazy(() => {
-    const component = getToolComponent(slug || '');
+    const component = getToolComponent(slug);
     if (!component) {
-      throw new Error('Tool not found');
+      throw new Error(`Tool not found: ${slug}`);
     }
     return Promise.resolve({ default: component });
   });
