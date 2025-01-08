@@ -1,5 +1,6 @@
-import { Suspense } from 'react';
+import { Suspense, lazy } from 'react';
 import { getToolComponent } from '../tools/registry';
+import { Navigate } from 'react-router-dom';
 
 interface ToolPreviewProps {
   slug: string;
@@ -7,10 +8,18 @@ interface ToolPreviewProps {
 }
 
 export function ToolPreview({ slug, isPublic = false }: ToolPreviewProps) {
-  const ToolComponent = getToolComponent(slug);
+  const ToolComponent = lazy(() => {
+    const component = getToolComponent(slug);
+    if (!component) {
+      throw new Error(`Tool not found: ${slug}`);
+    }
+    return Promise.resolve({ default: component });
+  });
 
   if (!ToolComponent) {
-    return (
+    return isPublic ? (
+      <Navigate to="/404" replace />
+    ) : (
       <div className="p-4 text-center text-gray-500">
         Tool not found or not available
       </div>

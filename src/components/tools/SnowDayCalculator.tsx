@@ -8,6 +8,7 @@ import { LocationInput } from "./snow-day/LocationInput";
 import { SnowDaysInput } from "./snow-day/SnowDaysInput";
 import { PredictionResult } from "./snow-day/PredictionResult";
 import { Helmet } from "react-helmet";
+import { useNavigate } from "react-router-dom";
 
 interface SnowDayCalculatorProps {
   isPublic?: boolean;
@@ -20,35 +21,37 @@ export default function SnowDayCalculator({ isPublic = false }: SnowDayCalculato
   const [snowDays, setSnowDays] = useState("");
   const [toolMetadata, setToolMetadata] = useState<{ name: string; description: string } | null>(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchToolMetadata = async () => {
       try {
         const { data, error } = await supabase
           .from("tools")
-          .select("name, description")
+          .select("name, description, published")
           .eq("slug", "snow-day-calculator")
-          .eq("published", true)
           .single();
 
         if (error) {
           console.error("Error fetching tool metadata:", error);
+          if (isPublic) navigate("/404", { replace: true });
           return;
         }
 
-        if (!data && isPublic) {
-          window.location.href = "/404";
+        if (!data || (isPublic && !data.published)) {
+          if (isPublic) navigate("/404", { replace: true });
           return;
         }
 
         setToolMetadata(data);
       } catch (error) {
         console.error("Error:", error);
+        if (isPublic) navigate("/404", { replace: true });
       }
     };
 
     fetchToolMetadata();
-  }, [isPublic]);
+  }, [isPublic, navigate]);
 
   const calculateSnowDayChance = async () => {
     if (!location) {
