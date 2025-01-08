@@ -3,9 +3,10 @@ import { getToolComponent } from '../tools/registry';
 
 interface ToolPreviewProps {
   slug: string;
+  isPublic?: boolean;
 }
 
-export function ToolPreview({ slug }: ToolPreviewProps) {
+export function ToolPreview({ slug, isPublic = false }: ToolPreviewProps) {
   const ToolComponent = getToolComponent(slug);
 
   if (!ToolComponent) {
@@ -17,9 +18,11 @@ export function ToolPreview({ slug }: ToolPreviewProps) {
   }
 
   return (
-    <div className="border rounded-lg p-4">
-      <h2 className="text-lg font-semibold mb-4">Tool Preview</h2>
-      <div className="bg-white rounded-lg shadow">
+    <div className={`${isPublic ? '' : 'border rounded-lg p-4'}`}>
+      {!isPublic && (
+        <h2 className="text-lg font-semibold mb-4">Tool Preview</h2>
+      )}
+      <div className={`${isPublic ? '' : 'bg-white rounded-lg shadow'}`}>
         <Suspense fallback={<div>Loading tool preview...</div>}>
           <ToolComponent />
         </Suspense>

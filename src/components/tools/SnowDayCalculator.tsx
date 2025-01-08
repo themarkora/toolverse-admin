@@ -19,18 +19,23 @@ export default function SnowDayCalculator() {
 
   useEffect(() => {
     const fetchToolMetadata = async () => {
-      const { data, error } = await supabase
-        .from("tools")
-        .select("name, description")
-        .eq("slug", "snow-day-calculator")
-        .single();
+      try {
+        const { data, error } = await supabase
+          .from("tools")
+          .select("name, description")
+          .eq("slug", "snow-day-calculator")
+          .eq("published", true)
+          .single();
 
-      if (error) {
-        console.error("Error fetching tool metadata:", error);
-        return;
+        if (error) {
+          console.error("Error fetching tool metadata:", error);
+          return;
+        }
+
+        setToolMetadata(data);
+      } catch (error) {
+        console.error("Error:", error);
       }
-
-      setToolMetadata(data);
     };
 
     fetchToolMetadata();
@@ -38,7 +43,11 @@ export default function SnowDayCalculator() {
 
   const calculateSnowDayChance = async () => {
     if (!location) {
-      setPrediction("Please enter a location");
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please enter a location",
+      });
       return;
     }
 
@@ -50,11 +59,6 @@ export default function SnowDayCalculator() {
       });
 
       if (error) throw error;
-
-      console.log('Raw Weather Data:', data);
-      console.log('Current Temperature:', data.current_temp);
-      console.log('Current Precipitation:', data.current_precip);
-      console.log('3-Day Forecast:', data.forecast);
 
       setSnowDays(data.snowDays.toString());
       setPrediction(
@@ -71,18 +75,24 @@ export default function SnowDayCalculator() {
     }
   };
 
+  if (!toolMetadata) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <p className="text-gray-500">Loading tool...</p>
+      </div>
+    );
+  }
+
   return (
     <>
-      {toolMetadata && (
-        <Helmet>
-          <title>{toolMetadata.name} | WebToolverse</title>
-          <meta name="description" content={toolMetadata.description} />
-          <meta property="og:title" content={`${toolMetadata.name} | WebToolverse`} />
-          <meta property="og:description" content={toolMetadata.description} />
-          <meta property="og:type" content="website" />
-          <meta property="og:url" content={`https://webtoolverse.com/tools/snow-day-calculator`} />
-        </Helmet>
-      )}
+      <Helmet>
+        <title>{toolMetadata.name} | WebToolverse</title>
+        <meta name="description" content={toolMetadata.description} />
+        <meta property="og:title" content={`${toolMetadata.name} | WebToolverse`} />
+        <meta property="og:description" content={toolMetadata.description} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={`https://webtoolverse.com/tools/snow-day-calculator`} />
+      </Helmet>
       
       <div className="min-h-[400px] p-8 bg-gradient-to-br from-[#2e3748] to-[#161b26] rounded-xl">
         <div className="max-w-3xl mx-auto text-center space-y-8">
@@ -90,16 +100,12 @@ export default function SnowDayCalculator() {
             <div className="w-24 h-24 mx-auto bg-[#ff7171] rounded-full flex items-center justify-center">
               <Snowflake className="w-12 h-12 text-white" />
             </div>
-            {toolMetadata && (
-              <>
-                <h1 className="text-3xl font-bold text-white">
-                  {toolMetadata.name}
-                </h1>
-                <p className="text-gray-300 max-w-lg mx-auto">
-                  {toolMetadata.description}
-                </p>
-              </>
-            )}
+            <h1 className="text-3xl font-bold text-white">
+              {toolMetadata.name}
+            </h1>
+            <p className="text-gray-300 max-w-lg mx-auto">
+              {toolMetadata.description}
+            </p>
           </div>
 
           <Card className="bg-white/10 backdrop-blur-lg border border-white/20 p-6">
