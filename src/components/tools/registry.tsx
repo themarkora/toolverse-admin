@@ -1,5 +1,5 @@
-import { SnowDayCalculator } from './SnowDayCalculator';
-import { LengthConverter } from './LengthConverter';
+import SnowDayCalculator from './SnowDayCalculator';
+import LengthConverter from './LengthConverter';
 
 const toolComponents = {
   'snow-day-calculator': SnowDayCalculator,
