@@ -1,6 +1,6 @@
 import { Suspense, useEffect, useState } from 'react';
 import { getToolComponent } from '../tools/registry';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
 
 interface ToolPreviewProps {
@@ -12,6 +12,7 @@ export function ToolPreview({ slug, isPublic = false }: ToolPreviewProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [toolExists, setToolExists] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
   
   console.log("ToolPreview rendering for slug:", slug, "isPublic:", isPublic);
   
@@ -21,7 +22,7 @@ export function ToolPreview({ slug, isPublic = false }: ToolPreviewProps) {
         console.log("Checking tool publication status for slug:", slug);
         const { data, error } = await supabase
           .from("tools")
-          .select("published, published_at")
+          .select("*")
           .eq("slug", slug)
           .single();
 
@@ -32,9 +33,16 @@ export function ToolPreview({ slug, isPublic = false }: ToolPreviewProps) {
         }
 
         console.log("Tool data from database:", data);
+        
+        if (!data) {
+          console.error("No tool found in database for slug:", slug);
+          setError("Tool not found");
+          return;
+        }
+
         setToolExists(true);
         
-        if (isPublic && !data?.published) {
+        if (isPublic && !data.published) {
           console.log("Tool is not published, redirecting...");
           setError("Tool is not published");
           return;
@@ -49,7 +57,7 @@ export function ToolPreview({ slug, isPublic = false }: ToolPreviewProps) {
     };
 
     checkToolPublished();
-  }, [slug, isPublic]);
+  }, [slug, isPublic, navigate]);
   
   const Component = getToolComponent(slug);
   

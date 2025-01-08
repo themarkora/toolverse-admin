@@ -47,7 +47,9 @@ function App() {
 export default function WrappedApp() {
   return (
     <Router>
-      <App />
+      <Suspense fallback={<div>Loading...</div>}>
+        <App />
+      </Suspense>
     </Router>
   );
 }
