@@ -44,6 +44,11 @@ export function ToolMetadata({ tool, onUpdate }: ToolMetadataProps) {
     }
   };
 
+  const handleViewLive = () => {
+    // Always open the production URL in a new tab
+    window.open(`https://webtoolverse.com/tools/${tool.slug}`, '_blank');
+  };
+
   return (
     <div className="space-y-4">
       <div>
@@ -60,6 +65,13 @@ export function ToolMetadata({ tool, onUpdate }: ToolMetadataProps) {
           variant="outline"
         >
           {isSaving ? "Saving..." : "Update Metadata"}
+        </Button>
+
+        <Button 
+          variant="default" 
+          onClick={handleViewLive}
+        >
+          View Live Tool
         </Button>
 
         <ToolPublishControl tool={tool} onUpdate={onUpdate} />
