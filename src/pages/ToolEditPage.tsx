@@ -62,7 +62,7 @@ export default function ToolEditPage() {
           </Button>
           <Button 
             variant="default" 
-            onClick={() => window.open(`/tools/${tool.slug}`, '_blank')}
+            onClick={() => window.open(`https://webtoolverse.com/tools/${tool.slug}`, '_blank')}
           >
             View Live Tool
           </Button>
