@@ -18,6 +18,7 @@ export type Database = {
           name: string
           published: boolean | null
           published_at: string | null
+          slug: string
           updated_at: string
         }
         Insert: {
@@ -28,6 +29,7 @@ export type Database = {
           name: string
           published?: boolean | null
           published_at?: string | null
+          slug: string
           updated_at?: string
         }
         Update: {
@@ -38,6 +40,7 @@ export type Database = {
           name?: string
           published?: boolean | null
           published_at?: string | null
+          slug?: string
           updated_at?: string
         }
         Relationships: []
