@@ -3,6 +3,7 @@ import { getToolComponent } from '../tools/registry';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
 interface ToolPreviewProps {
   slug: string;
@@ -13,6 +14,7 @@ export function ToolPreview({ slug, isPublic = false }: ToolPreviewProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [toolExists, setToolExists] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [debugInfo, setDebugInfo] = useState<any>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
   
@@ -29,21 +31,32 @@ export function ToolPreview({ slug, isPublic = false }: ToolPreviewProps) {
           .single();
 
         if (fetchError) {
-          console.error("[ToolPreview] Error fetching tool:", fetchError.message);
-          setError(fetchError.message);
+          console.error("[ToolPreview] Database error:", fetchError);
+          setDebugInfo({
+            type: 'database_error',
+            error: fetchError,
+            context: { slug, isPublic }
+          });
+          setError(`Database error: ${fetchError.message}`);
           toast({
             variant: "destructive",
-            title: "Error loading tool",
+            title: "Database Error",
             description: fetchError.message
           });
           return;
         }
 
         console.log("[ToolPreview] Tool data from database:", data);
+        setDebugInfo(prev => ({ ...prev, databaseResponse: data }));
         
         if (!data) {
           const msg = `No tool found with slug: ${slug}`;
           console.error("[ToolPreview]", msg);
+          setDebugInfo(prev => ({
+            ...prev,
+            type: 'tool_not_found',
+            context: { slug, isPublic }
+          }));
           setError(msg);
           toast({
             variant: "destructive",
@@ -58,6 +71,11 @@ export function ToolPreview({ slug, isPublic = false }: ToolPreviewProps) {
         if (isPublic && !data.published) {
           const msg = "This tool is not yet published";
           console.log("[ToolPreview]", msg);
+          setDebugInfo(prev => ({
+            ...prev,
+            type: 'tool_not_published',
+            toolData: data
+          }));
           setError(msg);
           toast({
             variant: "destructive",
@@ -70,6 +88,11 @@ export function ToolPreview({ slug, isPublic = false }: ToolPreviewProps) {
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : "Unknown error occurred";
         console.error("[ToolPreview] Error checking tool status:", errorMessage);
+        setDebugInfo({
+          type: 'unexpected_error',
+          error: err,
+          context: { slug, isPublic }
+        });
         setError(errorMessage);
         toast({
           variant: "destructive",
@@ -99,14 +122,28 @@ export function ToolPreview({ slug, isPublic = false }: ToolPreviewProps) {
 
   if (error || !Component) {
     console.error("[ToolPreview] Tool error:", error || "Component not found for slug: " + slug);
-    return isPublic ? (
-      <Navigate to="/" replace />
-    ) : (
-      <div className="p-8 text-center bg-red-50 rounded-lg">
-        <h3 className="text-lg font-semibold text-red-800 mb-2">Tool Error</h3>
-        <p className="text-red-600">
-          {error || `Tool component not found for: ${slug}`}
-        </p>
+    
+    if (isPublic) {
+      return <Navigate to="/" replace />;
+    }
+    
+    return (
+      <div className="p-8 space-y-4">
+        <Alert variant="destructive">
+          <AlertTitle>Tool Error</AlertTitle>
+          <AlertDescription>
+            {error || `Tool component not found for: ${slug}`}
+          </AlertDescription>
+        </Alert>
+        
+        {process.env.NODE_ENV === 'development' && debugInfo && (
+          <div className="mt-4 p-4 bg-gray-50 rounded-lg border">
+            <h3 className="font-semibold mb-2">Debug Information:</h3>
+            <pre className="text-xs whitespace-pre-wrap overflow-x-auto">
+              {JSON.stringify(debugInfo, null, 2)}
+            </pre>
+          </div>
+        )}
       </div>
     );
   }

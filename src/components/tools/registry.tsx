@@ -20,7 +20,8 @@ export const getToolComponent = (slug: string) => {
   const component = toolComponents[slug as ToolSlug];
   
   if (!component) {
-    console.error(`[Registry] No component found for slug: ${slug}`);
+    console.error(`[Registry] No component found for slug: ${slug}. Available components:`, 
+      Object.keys(toolComponents).join(', '));
     return null;
   }
   
