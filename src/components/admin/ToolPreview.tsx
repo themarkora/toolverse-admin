@@ -1,6 +1,7 @@
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
 import { getToolComponent } from '../tools/registry';
 import { Navigate } from 'react-router-dom';
+import { supabase } from "@/integrations/supabase/client";
 
 interface ToolPreviewProps {
   slug: string;
@@ -9,6 +10,30 @@ interface ToolPreviewProps {
 
 export function ToolPreview({ slug, isPublic = false }: ToolPreviewProps) {
   console.log("ToolPreview rendering for slug:", slug, "isPublic:", isPublic);
+  
+  useEffect(() => {
+    const checkToolPublished = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("tools")
+          .select("published, published_at")
+          .eq("slug", slug)
+          .single();
+
+        console.log("Tool publication status:", {
+          slug,
+          data,
+          error: error?.message
+        });
+      } catch (err) {
+        console.error("Error checking tool status:", err);
+      }
+    };
+
+    if (isPublic) {
+      checkToolPublished();
+    }
+  }, [slug, isPublic]);
   
   const Component = getToolComponent(slug);
   

@@ -11,12 +11,19 @@ import { useParams } from "react-router-dom";
 // Tool wrapper component to dynamically load the correct tool
 const PublicToolWrapper = () => {
   const { slug } = useParams();
-  if (!slug) return null;
+  console.log("PublicToolWrapper rendering with slug:", slug);
+  
+  if (!slug) {
+    console.log("No slug provided to PublicToolWrapper");
+    return null;
+  }
   
   return <ToolPreview slug={slug} isPublic={true} />;
 };
 
 function App() {
+  console.log("App rendering, current path:", window.location.pathname);
+  
   return (
     <Router>
       <Routes>

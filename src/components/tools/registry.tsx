@@ -8,5 +8,10 @@ const toolComponents = {
 
 export const getToolComponent = (slug: string) => {
   console.log("Getting tool component for slug:", slug);
-  return toolComponents[slug as keyof typeof toolComponents];
+  console.log("Available tools:", Object.keys(toolComponents));
+  
+  const component = toolComponents[slug as keyof typeof toolComponents];
+  console.log("Found component:", component ? "Yes" : "No");
+  
+  return component;
 };
