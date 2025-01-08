@@ -13,6 +13,16 @@ const PublicToolWrapper = () => {
   const { slug } = useParams();
   if (!slug) return null;
   
+  // Check if we're on the preview domain
+  const isPreviewDomain = window.location.hostname.includes('lovable.app');
+  const targetDomain = 'https://webtoolverse.com';
+  
+  // Redirect from preview to production domain
+  if (isPreviewDomain) {
+    window.location.href = `${targetDomain}/tools/${slug}`;
+    return null;
+  }
+  
   return <ToolPreview slug={slug} isPublic={true} />;
 };
 

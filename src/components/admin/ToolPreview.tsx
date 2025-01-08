@@ -1,6 +1,7 @@
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
 import { getToolComponent } from '../tools/registry';
 import { Navigate } from 'react-router-dom';
+import { supabase } from "@/integrations/supabase/client";
 
 interface ToolPreviewProps {
   slug: string;
@@ -9,6 +10,24 @@ interface ToolPreviewProps {
 
 export function ToolPreview({ slug, isPublic = false }: ToolPreviewProps) {
   const Component = getToolComponent(slug);
+  
+  useEffect(() => {
+    const checkToolPublished = async () => {
+      if (isPublic) {
+        const { data, error } = await supabase
+          .from('tools')
+          .select('published')
+          .eq('slug', slug)
+          .single();
+        
+        if (error || !data?.published) {
+          window.location.href = '/404';
+        }
+      }
+    };
+    
+    checkToolPublished();
+  }, [slug, isPublic]);
   
   if (!Component) {
     return isPublic ? (
