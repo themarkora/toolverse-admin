@@ -77,11 +77,7 @@ export function ToolMetadata({ tool, onUpdate }: ToolMetadataProps) {
   };
 
   const handleViewLive = () => {
-    // For local development, use the current domain
-    const domain = window.location.hostname === 'localhost' 
-      ? window.location.origin 
-      : 'https://webtoolverse.com';
-    window.open(`${domain}/tools/${tool.slug}`, '_blank');
+    window.open(`https://webtoolverse.com/tools/${tool.slug}`, '_blank');
   };
 
   return (

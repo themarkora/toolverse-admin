@@ -5,7 +5,6 @@ interface ToolInfoDisplayProps {
 }
 
 export function ToolInfoDisplay({ tool }: ToolInfoDisplayProps) {
-  // Always use the production domain for the public URL
   const publicUrl = `https://webtoolverse.com/tools/${tool.slug}`;
 
   return (
