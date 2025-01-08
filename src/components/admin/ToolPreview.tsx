@@ -8,11 +8,14 @@ interface ToolPreviewProps {
 }
 
 export function ToolPreview({ slug, isPublic = false }: ToolPreviewProps) {
+  console.log("ToolPreview rendering for slug:", slug, "isPublic:", isPublic);
+  
   const Component = getToolComponent(slug);
   
   if (!Component) {
+    console.error("Tool component not found for slug:", slug);
     return isPublic ? (
-      <Navigate to="/404" replace />
+      <Navigate to="/" replace />
     ) : (
       <div className="p-4 text-center text-gray-500">
         Tool not found or not available
