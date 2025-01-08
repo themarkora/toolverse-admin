@@ -22,7 +22,8 @@ serve(async (req) => {
     console.log('Weather API Key present:', !!WEATHER_API_KEY)
 
     // Construct and log the API URL (without the key)
-    const apiUrl = `http://api.weatherapi.com/v1/forecast.json?key=${WEATHER_API_KEY}&q=${encodeURIComponent(location)}&days=3&aqi=no`
+    // Fixed URL to use https instead of http
+    const apiUrl = `https://api.weatherapi.com/v1/forecast.json?key=${WEATHER_API_KEY}&q=${encodeURIComponent(location)}&days=3&aqi=no`
     console.log('Calling WeatherAPI URL:', apiUrl.replace(WEATHER_API_KEY!, '[REDACTED]'))
 
     // Get current weather and forecast data
