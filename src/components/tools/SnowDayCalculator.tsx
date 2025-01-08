@@ -80,7 +80,7 @@ export default function SnowDayCalculator() {
           <meta property="og:title" content={`${toolMetadata.name} | WebToolverse`} />
           <meta property="og:description" content={toolMetadata.description} />
           <meta property="og:type" content="website" />
-          <meta property="og:url" content={`https://webtoolverse.com/snow-day-calculator`} />
+          <meta property="og:url" content={`https://webtoolverse.com/tools/snow-day-calculator`} />
         </Helmet>
       )}
       
