@@ -5,21 +5,30 @@ import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import ToolEditPage from "./pages/ToolEditPage";
 import { ToolPreview } from "./components/admin/ToolPreview";
-import { getToolComponent } from "./components/tools/registry";
 import { useParams, useLocation } from "react-router-dom";
+import { useToast } from "@/components/ui/use-toast";
 
 const PublicToolWrapper = () => {
   const { slug } = useParams();
   const location = useLocation();
+  const { toast } = useToast();
   
   useEffect(() => {
-    console.log("PublicToolWrapper mounted");
-    console.log("Current path:", location.pathname);
-    console.log("Slug param:", slug);
-  }, [location, slug]);
+    console.log("[PublicToolWrapper] Mounted");
+    console.log("[PublicToolWrapper] Current path:", location.pathname);
+    console.log("[PublicToolWrapper] Slug param:", slug);
+    
+    if (!slug) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "No tool specified"
+      });
+    }
+  }, [location, slug, toast]);
   
   if (!slug) {
-    console.log("No slug provided to PublicToolWrapper");
+    console.log("[PublicToolWrapper] No slug provided");
     return null;
   }
   
@@ -30,7 +39,7 @@ function App() {
   const location = useLocation();
   
   useEffect(() => {
-    console.log("App rendering, current path:", location.pathname);
+    console.log("[App] Rendering, current path:", location.pathname);
   }, [location]);
   
   return (
@@ -47,7 +56,16 @@ function App() {
 export default function WrappedApp() {
   return (
     <Router>
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense 
+        fallback={
+          <div className="flex items-center justify-center min-h-screen">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading application...</p>
+            </div>
+          </div>
+        }
+      >
         <App />
       </Suspense>
     </Router>
