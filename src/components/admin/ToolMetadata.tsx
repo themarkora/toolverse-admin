@@ -76,6 +76,8 @@ export function ToolMetadata({ tool, onUpdate }: ToolMetadataProps) {
     }
   };
 
+  const publicUrl = `https://webtoolverse.com/tools/${tool.slug}`;
+
   return (
     <div className="space-y-4">
       <div>
@@ -103,12 +105,12 @@ export function ToolMetadata({ tool, onUpdate }: ToolMetadataProps) {
           <label className="text-sm font-medium">Public URL</label>
           <p className="mt-1">
             <a 
-              href={`/tools/${tool.slug}`} 
+              href={publicUrl}
               target="_blank" 
               rel="noopener noreferrer"
               className="text-blue-600 hover:underline"
             >
-              /tools/{tool.slug}
+              {publicUrl}
             </a>
           </p>
         </div>
