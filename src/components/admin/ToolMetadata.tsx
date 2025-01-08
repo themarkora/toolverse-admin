@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Tool } from "@/types/tools";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
@@ -13,7 +14,27 @@ interface ToolMetadataProps {
 
 export function ToolMetadata({ tool, onUpdate }: ToolMetadataProps) {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [isSaving, setIsSaving] = useState(false);
+
+  // Check authentication status when component mounts
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  const checkAuth = async () => {
+    const { data: { session }, error } = await supabase.auth.getSession();
+    
+    if (error || !session) {
+      toast({
+        variant: "destructive",
+        title: "Authentication Error",
+        description: "Please log in again to continue.",
+      });
+      navigate("/admin/login");
+      return;
+    }
+  };
 
   const handleSave = async () => {
     try {
@@ -34,6 +55,16 @@ export function ToolMetadata({ tool, onUpdate }: ToolMetadataProps) {
       
       onUpdate();
     } catch (error: any) {
+      if (error.message?.includes('refresh_token_not_found')) {
+        toast({
+          variant: "destructive",
+          title: "Session Expired",
+          description: "Please log in again to continue.",
+        });
+        navigate("/admin/login");
+        return;
+      }
+
       toast({
         variant: "destructive",
         title: "Error",
