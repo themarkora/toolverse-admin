@@ -7,6 +7,10 @@ import { Tool } from "@/types/tools";
 import { ToolPreview } from "@/components/admin/ToolPreview";
 import { ToolMetadata } from "@/components/admin/ToolMetadata";
 
+// Get the current domain based on environment
+const PRODUCTION_DOMAIN = "https://webtoolverse.com";
+const isDevelopment = process.env.NODE_ENV === "development";
+
 export default function ToolEditPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
@@ -37,8 +41,13 @@ export default function ToolEditPage() {
     fetchTool();
   }, [slug, navigate, toast]);
 
-  const handleToolUpdate = () => {
-    window.location.reload();
+  const getToolUrl = (slug: string) => {
+    if (isDevelopment) {
+      // In development, use relative path
+      return `/tools/${slug}`;
+    }
+    // In production, use the full domain
+    return `${PRODUCTION_DOMAIN}/tools/${slug}`;
   };
 
   if (!tool) {
@@ -62,7 +71,7 @@ export default function ToolEditPage() {
           </Button>
           <Button 
             variant="default" 
-            onClick={() => window.open(`https://webtoolverse.com/tools/${tool.slug}`, '_blank')}
+            onClick={() => window.open(getToolUrl(tool.slug), '_blank')}
           >
             View Live Tool
           </Button>
@@ -70,7 +79,7 @@ export default function ToolEditPage() {
       </div>
 
       <div className="grid gap-8 md:grid-cols-2">
-        <ToolMetadata tool={tool} onUpdate={handleToolUpdate} />
+        <ToolMetadata tool={tool} onUpdate={() => window.location.reload()} />
         <ToolPreview slug={tool.slug} />
       </div>
     </div>
