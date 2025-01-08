@@ -8,7 +8,6 @@ import { LocationInput } from "./snow-day/LocationInput";
 import { SnowDaysInput } from "./snow-day/SnowDaysInput";
 import { PredictionResult } from "./snow-day/PredictionResult";
 import { Helmet } from "react-helmet";
-import { useNavigate } from "react-router-dom";
 
 interface SnowDayCalculatorProps {
   isPublic?: boolean;
@@ -21,7 +20,6 @@ export default function SnowDayCalculator({ isPublic = false }: SnowDayCalculato
   const [snowDays, setSnowDays] = useState("");
   const [toolMetadata, setToolMetadata] = useState<{ name: string; description: string } | null>(null);
   const { toast } = useToast();
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchToolMetadata = async () => {
@@ -91,12 +89,11 @@ export default function SnowDayCalculator({ isPublic = false }: SnowDayCalculato
   return (
     <>
       <Helmet>
-        <title>{toolMetadata.name} | WebToolverse</title>
+        <title>{toolMetadata.name}</title>
         <meta name="description" content={toolMetadata.description} />
-        <meta property="og:title" content={`${toolMetadata.name} | WebToolverse`} />
+        <meta property="og:title" content={toolMetadata.name} />
         <meta property="og:description" content={toolMetadata.description} />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content={`https://webtoolverse.com/tools/snow-day-calculator`} />
       </Helmet>
       
       <div className={`${isPublic ? 'min-h-screen' : 'min-h-[400px]'} p-8 bg-gradient-to-br from-[#2e3748] to-[#161b26] rounded-xl`}>
