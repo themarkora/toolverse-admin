@@ -81,7 +81,7 @@ export function ToolMetadata({ tool, onUpdate }: ToolMetadataProps) {
   
   // Use the appropriate base URL based on the environment
   const baseUrl = isLocalPreview 
-    ? window.location.origin  // Use current origin for preview
+    ? `https://id-preview--${window.location.hostname.split('--')[1]}`  // Use preview URL format
     : 'https://webtoolverse.com'; // Use production URL otherwise
     
   const publicUrl = `${baseUrl}/tools/${tool.slug}`;
