@@ -77,11 +77,11 @@ export function ToolMetadata({ tool, onUpdate }: ToolMetadataProps) {
   };
 
   // Get the current hostname
-  const isLocalPreview = window.location.hostname.includes('lovable.app');
+  const isLocalPreview = window.location.hostname.includes('lovableproject.com');
   
   // Use the appropriate base URL based on the environment
   const baseUrl = isLocalPreview 
-    ? `https://id-preview--${window.location.hostname.split('--')[1]}`  // Use preview URL format
+    ? window.location.origin  // Use current origin for preview
     : 'https://webtoolverse.com'; // Use production URL otherwise
     
   const publicUrl = `${baseUrl}/tools/${tool.slug}`;
