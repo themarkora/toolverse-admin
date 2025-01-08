@@ -11,3 +11,7 @@ export const getToolComponent = (slug: string) => {
   if (!slug) return null;
   return toolComponents[slug as ToolSlug] || null;
 };
+
+export const getPublicToolPath = (slug: string) => {
+  return `/tools/${slug}`;
+};

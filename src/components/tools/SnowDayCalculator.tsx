@@ -9,7 +9,11 @@ import { SnowDaysInput } from "./snow-day/SnowDaysInput";
 import { PredictionResult } from "./snow-day/PredictionResult";
 import { Helmet } from "react-helmet";
 
-export default function SnowDayCalculator() {
+interface SnowDayCalculatorProps {
+  isPublic?: boolean;
+}
+
+export default function SnowDayCalculator({ isPublic = false }: SnowDayCalculatorProps) {
   const [location, setLocation] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [prediction, setPrediction] = useState<string | null>(null);
@@ -32,6 +36,11 @@ export default function SnowDayCalculator() {
           return;
         }
 
+        if (!data && isPublic) {
+          window.location.href = "/404";
+          return;
+        }
+
         setToolMetadata(data);
       } catch (error) {
         console.error("Error:", error);
@@ -39,7 +48,7 @@ export default function SnowDayCalculator() {
     };
 
     fetchToolMetadata();
-  }, []);
+  }, [isPublic]);
 
   const calculateSnowDayChance = async () => {
     if (!location) {
@@ -94,7 +103,7 @@ export default function SnowDayCalculator() {
         <meta property="og:url" content={`https://webtoolverse.com/tools/snow-day-calculator`} />
       </Helmet>
       
-      <div className="min-h-[400px] p-8 bg-gradient-to-br from-[#2e3748] to-[#161b26] rounded-xl">
+      <div className={`${isPublic ? 'min-h-screen' : 'min-h-[400px]'} p-8 bg-gradient-to-br from-[#2e3748] to-[#161b26] rounded-xl`}>
         <div className="max-w-3xl mx-auto text-center space-y-8">
           <div className="space-y-4">
             <div className="w-24 h-24 mx-auto bg-[#ff7171] rounded-full flex items-center justify-center">
