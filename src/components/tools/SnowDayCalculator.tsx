@@ -28,30 +28,23 @@ export default function SnowDayCalculator({ isPublic = false }: SnowDayCalculato
       try {
         const { data, error } = await supabase
           .from("tools")
-          .select("name, description, published")
+          .select("name, description")
           .eq("slug", "snow-day-calculator")
           .single();
 
         if (error) {
           console.error("Error fetching tool metadata:", error);
-          if (isPublic) navigate("/404", { replace: true });
-          return;
-        }
-
-        if (!data || (isPublic && !data.published)) {
-          if (isPublic) navigate("/404", { replace: true });
           return;
         }
 
         setToolMetadata(data);
       } catch (error) {
         console.error("Error:", error);
-        if (isPublic) navigate("/404", { replace: true });
       }
     };
 
     fetchToolMetadata();
-  }, [isPublic, navigate]);
+  }, []);
 
   const calculateSnowDayChance = async () => {
     if (!location) {
