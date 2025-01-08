@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Snowflake } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -7,13 +7,34 @@ import { useToast } from "@/components/ui/use-toast";
 import { LocationInput } from "./snow-day/LocationInput";
 import { SnowDaysInput } from "./snow-day/SnowDaysInput";
 import { PredictionResult } from "./snow-day/PredictionResult";
+import { Helmet } from "react-helmet";
 
 export default function SnowDayCalculator() {
   const [location, setLocation] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [prediction, setPrediction] = useState<string | null>(null);
   const [snowDays, setSnowDays] = useState("");
+  const [toolMetadata, setToolMetadata] = useState<{ name: string; description: string } | null>(null);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const fetchToolMetadata = async () => {
+      const { data, error } = await supabase
+        .from("tools")
+        .select("name, description")
+        .eq("slug", "snow-day-calculator")
+        .single();
+
+      if (error) {
+        console.error("Error fetching tool metadata:", error);
+        return;
+      }
+
+      setToolMetadata(data);
+    };
+
+    fetchToolMetadata();
+  }, []);
 
   const calculateSnowDayChance = async () => {
     if (!location) {
@@ -30,7 +51,6 @@ export default function SnowDayCalculator() {
 
       if (error) throw error;
 
-      // Log the raw weather data for verification
       console.log('Raw Weather Data:', data);
       console.log('Current Temperature:', data.current_temp);
       console.log('Current Precipitation:', data.current_precip);
@@ -52,38 +72,55 @@ export default function SnowDayCalculator() {
   };
 
   return (
-    <div className="min-h-[400px] p-8 bg-gradient-to-br from-[#2e3748] to-[#161b26] rounded-xl">
-      <div className="max-w-3xl mx-auto text-center space-y-8">
-        <div className="space-y-4">
-          <div className="w-24 h-24 mx-auto bg-[#ff7171] rounded-full flex items-center justify-center">
-            <Snowflake className="w-12 h-12 text-white" />
+    <>
+      {toolMetadata && (
+        <Helmet>
+          <title>{toolMetadata.name} | WebToolverse</title>
+          <meta name="description" content={toolMetadata.description} />
+          <meta property="og:title" content={`${toolMetadata.name} | WebToolverse`} />
+          <meta property="og:description" content={toolMetadata.description} />
+          <meta property="og:type" content="website" />
+          <meta property="og:url" content={`https://webtoolverse.com/snow-day-calculator`} />
+        </Helmet>
+      )}
+      
+      <div className="min-h-[400px] p-8 bg-gradient-to-br from-[#2e3748] to-[#161b26] rounded-xl">
+        <div className="max-w-3xl mx-auto text-center space-y-8">
+          <div className="space-y-4">
+            <div className="w-24 h-24 mx-auto bg-[#ff7171] rounded-full flex items-center justify-center">
+              <Snowflake className="w-12 h-12 text-white" />
+            </div>
+            {toolMetadata && (
+              <>
+                <h1 className="text-3xl font-bold text-white">
+                  {toolMetadata.name}
+                </h1>
+                <p className="text-gray-300 max-w-lg mx-auto">
+                  {toolMetadata.description}
+                </p>
+              </>
+            )}
           </div>
-          <h1 className="text-3xl font-bold text-white">
-            Snow Day Predictor
-          </h1>
-          <p className="text-gray-300 max-w-lg mx-auto">
-            Enter your location to calculate your chance of having snow days using real-time weather data
-          </p>
+
+          <Card className="bg-white/10 backdrop-blur-lg border border-white/20 p-6">
+            <LocationInput location={location} onChange={setLocation} />
+
+            <div className="mt-4">
+              <SnowDaysInput snowDays={snowDays} />
+            </div>
+
+            <Button 
+              onClick={calculateSnowDayChance}
+              disabled={isLoading}
+              className="mt-6 w-full md:w-auto bg-[#ff7171] hover:bg-[#ff5f5f] text-white font-semibold px-8"
+            >
+              {isLoading ? "Calculating..." : "Predict"}
+            </Button>
+          </Card>
+
+          <PredictionResult prediction={prediction} />
         </div>
-
-        <Card className="bg-white/10 backdrop-blur-lg border border-white/20 p-6">
-          <LocationInput location={location} onChange={setLocation} />
-
-          <div className="mt-4">
-            <SnowDaysInput snowDays={snowDays} />
-          </div>
-
-          <Button 
-            onClick={calculateSnowDayChance}
-            disabled={isLoading}
-            className="mt-6 w-full md:w-auto bg-[#ff7171] hover:bg-[#ff5f5f] text-white font-semibold px-8"
-          >
-            {isLoading ? "Calculating..." : "Predict"}
-          </Button>
-        </Card>
-
-        <PredictionResult prediction={prediction} />
       </div>
-    </div>
+    </>
   );
 }
